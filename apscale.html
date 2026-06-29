@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: APSCALE | Metabarcoding Workshop</title>
+    <meta name="description" content="Learn how to run APSCALE for sequence processing, clustering, and initial taxonomic assignment.">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* ── Premium Pro Slider V2 ── */
+        .pro-slider {
+            position: relative;
+            width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin: 2.5rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 0 0 1px var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pro-slider-display {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pro-slider-images {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .pro-slider-images img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            object-fit: contain;
+            /* Default transform before active */
+            transform: scale(1); 
+            transform-origin: 50% 50%;
+            transition: opacity 0.4s ease;
+        }
+        .pro-slider-images img.active {
+            opacity: 1;
+        }
+
+        /* Mouse Pointer Animation */
+        .mouse-cursor {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: left 1s cubic-bezier(0.25, 1, 0.5, 1), top 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s;
+            /* Standard mouse arrow SVG */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='white' stroke='black' stroke-width='1.5'%3E%3Cpath d='M4.5 3l15 11.5-6.5 1.5 3.5 7.5-3 1.5-3.5-7.5-4.5 5z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        }
+        .mouse-cursor.clicking {
+            animation: click-pulse 0.4s ease forwards;
+        }
+        @keyframes click-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.8); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4)); }
+            100% { transform: scale(1); }
+        }
+        .click-ripple {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 49;
+        }
+        .click-ripple.animate {
+            animation: ripple-out 0.6s ease-out forwards;
+        }
+        @keyframes ripple-out {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+
+        /* Text Area (Moved OUTSIDE image) */
+        .pro-slider-caption {
+            padding: 1.5rem;
+            background: var(--bg-color);
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .pro-slider-text {
+            display: none;
+        }
+        .pro-slider-text.active {
+            display: block;
+            animation: fade-in 0.4s ease;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            color: var(--accent-color);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pro-slider-text p {
+            color: var(--text-color);
+            font-size: 1.05rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Controls */
+        .pro-slider-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .pro-slider-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover {
+            background: var(--border-color);
+        }
+        
+        .pro-slider-dots {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dot:hover {
+            background: var(--text-muted);
+        }
+        .dot.active {
+            background: var(--accent-color);
+            width: 24px;
+        }
+        
+        /* Auto-play progress bar */
+        .progress-bar-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-color, #4facfe);
+            transition: width linear;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <a href="index.html" class="sidebar-logo">
+            <i class="ph-fill ph-dna"></i>
+            <span>Me-Barcode</span>
+        </a>
+
+        <div class="nav-section">Overview</div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html">Introduction &amp; Roadmap</a></li>
+        </ul>
+
+        <div class="nav-section">Pipeline Modules</div>
+        <ul class="sidebar-nav">
+            <li><a href="apscale.html" class="active">1. APSCALE Processing</a></li>
+            <li><a href="dada2.html">2. DADA2 &amp; RDP</a></li>
+            <li><a href="kaggle.html">3. Cloud Execution (Kaggle)</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <h1>Module 1: APSCALE Processing</h1>
+            <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 800px; line-height: 1.6;">Welcome to the first stage of our pipeline. APSCALE handles the computationally intensive task of merging raw paired-end reads, quality filtering, and generating Exact Sequence Variants (ESVs) or Operational Taxonomic Units (OTUs).</p>
+            
+            <!-- Hidden helper alert -->
+            <div id="dev-coord-helper" style="display:none; background: #e0f2fe; color: #0284c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.9rem; align-items: center; justify-content: space-between;">
+                <div>
+                    <strong>Developer Mode:</strong> Click on the images to set the exact mouse click locations! The animation will update instantly and save to your browser.
+                </div>
+                <button id="export-coords-btn" style="background: #0284c7; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-weight: bold;">Download Coordinates</button>
+            </div>
+        </header>
+
+        <!-- ══ Section 1: Launching APSCALE ══ -->
+        <section>
+            <h2>1. Launching the Interface</h2>
+            <p>APSCALE is a powerful Python tool that features a beautiful browser-based GUI. To make things easy, we bypass the terminal by using a <code>.bat</code> shortcut. Double-clicking this automatically boots up the conda environment and launches the dashboard.</p>
+            <div class="pro-slider" id="sv-launch"></div>
+        </section>
+
+        <!-- ══ Section 2: Project Creation ══ -->
+        <section>
+            <h2 style="margin-top: 4rem;">2. Creating Your Project Space</h2>
+            <p>Before doing any bioinformatics, APSCALE needs to build its dedicated folder tree. Through the GUI, simply point it to your main working directory and initialize the project structure.</p>
+            <div class="pro-slider" id="sv-project"></div>
+        </section>
+
+        <!-- ══ Section 3: Raw Data Formatting & Execution ══ -->
+        <section>
+            <h2 style="margin-top: 4rem;">3. Raw Data Formatting & Execution</h2>
+            <p>Raw data from sequencing facilities is usually nested deeply. We use a custom Python script that iterates over all nested folders, renames them to standard <code>_R1</code>/<code>_R2</code> formats, and copies them out. Execute this script via the terminal.</p>
+            <div class="pro-slider" id="sv-script"></div>
+        </section>
+
+        <!-- ══ Section 4: Data Import to APSCALE ══ -->
+        <section>
+            <h2 style="margin-top: 4rem;">4. Data Import &amp; Verification</h2>
+            <p>Your files are now perfectly renamed and gathered in one flat directory. The final step is importing them into the APSCALE folder where the pipeline expects to find them: <code>02_demultiplexing/data/</code>.</p>
+            <div class="pro-slider" id="sv-import"></div>
+        </section>
+
+        <!-- ══ Section 5: ESV/OTU Processing Pipeline ══ -->
+        <section>
+            <h2 style="margin-top: 4rem;">5. ESV/OTU Processing Pipeline</h2>
+            <p>This core execution phase sequentially handles Paired-End Merging, Primer Trimming, Quality Filtering, Dereplication, and finally OTU Clustering (or ESV generation). Simply configure the parameters for each module in the GUI and let APSCALE process them automatically.</p>
+            <div class="pro-slider" id="sv-otu"></div>
+        </section>
+
+        <!-- ══ Section 6: BLAST Taxonomic Assignment ══ -->
+        <section>
+            <h2 style="margin-top: 4rem;">6. BLAST Taxonomic Assignment</h2>
+            <p>With our OTUs generated, we must classify them taxonomically. This requires fetching the appropriate reference databases (e.g. BOLD, NCBI) and executing Megablast to align and classify our sequence variants.</p>
+            <div class="pro-slider" id="sv-blast"></div>
+
+            <div style="margin-top: 4rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                <a href="index.html" class="text-link"><i class="ph-bold ph-arrow-left"></i> Back to Dashboard</a>
+                <a href="dada2.html" class="btn">Next Module: DADA2 &amp; RDP <i class="ph-bold ph-arrow-right"></i></a>
+            </div>
+        </section>
+    </main>
+
+    <!-- ── Premium Slider Engine with Mouse Animation ── -->
+    <script>
+    (function() {
+        // I have added 'target' parameters (x, y, zoom). 
+        // Default is center (50, 50) and no zoom (1). 
+        // You can guide me on the specific coordinates to make the mouse click exactly on buttons!
+        const stepData = {
+            'sv-launch': [
+                { src: './assets/img/steps/01_step_33_launch.png', text: 'Locate and double-click the .bat file to launch APSCALE seamlessly.', target: {x: 1.0, y: 29.2, z: 3.0} },
+                { src: './assets/img/steps/02_step_66_gui.png', text: 'The browser-based APSCALE GUI opens successfully. Notice there are no files or projects selected yet.', target: {x: 5.8, y: 40.6, z: 3.0} }
+            ],
+            'sv-project': [
+                { src: './assets/img/steps/03_step_73_copy_dir.png', text: 'Copy the directory path of your working folder to act as the root for APSCALE.', target: {x: 14.8, y: 10.8, z: 3.0} },
+                { src: './assets/img/steps/04_step_80_paste_dir.png', text: 'Paste the path into the GUI (no quotes), click "Create database and tagging scheme folders", then "Remember project folder".', target: {x: 4.1, y: 47.0, z: 3.0} },
+                { src: './assets/img/steps/05_step_109_gen_project.png', text: 'Type your desired project name (e.g. WORKSHOP) and press enter to generate the pipeline skeleton.', target: {x: 4.4, y: 52.9, z: 3.0} },
+                { src: './assets/img/steps/06_step_113_project_visible.png', text: 'The new project becomes visible.', target: {x: 20.3, y: 42.9, z: 3.0} },
+                { src: './assets/img/steps/07_step_115_project_folder.png', text: 'In your file explorer, you can now see the extensive folder tree APSCALE generated.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/08_step_118_data_target.png', text: 'Navigate into "02_demultiplexing/data". This is the required target location for your sequencing reads.', target: {x: 57.8, y: 19.5, z: 3.0} },
+                { src: './assets/img/steps/09_step_125_refresh_no_data.png', text: 'Clicking "Refresh files and folders" in the GUI confirms the project is still empty. It needs data inputs.', target: {x: 5.6, y: 92.3, z: 3.0} }
+            ],
+            'sv-script': [
+                { src: './assets/img/steps/10_step_133_seq_data.png', text: 'Inspect raw sequencing data. APSCALE strictly requires "_R1" and "_R2" naming, but raw files often look like "raw_1".', target: {x: 24.3, y: 26.9, z: 3.0} },
+                { src: './assets/img/steps/11_step_157_fetch_script.png', text: 'Fetch the custom Python renaming script (`collect_fastq.py`) from the VERTICAL_ALGAS repository. <a href="./collect_fastq.py" download style="display:inline-block; margin-left:10px; color:var(--primary-color); text-decoration:underline; font-weight:bold;"><i class="ph-bold ph-download-simple"></i> Download Script</a>', target: {x: 23.2, y: 19.4, z: 3.0} },
+                { src: './assets/img/steps/12_step_210_paste_script.png', text: 'Paste the script directly into the root folder containing the raw nested fastq.gz directories.', target: {x: 20.6, y: 47.2, z: 3.0} },
+                { src: './assets/img/steps/13_step_225_open_terminal.png', text: 'Right-click and open a terminal/PowerShell window directly from this folder.', target: {x: 27.2, y: 73.6, z: 3.0} },
+                { src: './assets/img/steps/14_step_232_rename_cmd.png', text: 'Enter the python command to execute `collect_fastq.py` against the raw files.', target: {x: 21.6, y: 20.1, z: 3.0} },
+                { src: './assets/img/steps/15_step_234_terminal_output.png', text: 'The terminal output will log the progress, confirming files are being copied and renamed correctly.', target: {x: 17.0, y: 52.0, z: 3.0} },
+                { src: './assets/img/steps/16_step_239_folder_output.png', text: 'A clean output folder (`FASTQ_Renamed/`) is generated containing flat, perfectly formatted files.', target: {x: 50, y: 50, z: 1} }
+            ],
+            'sv-import': [
+                { src: './assets/img/steps/17_step_248_copy_files.png', text: 'Highlight and copy all the newly renamed "_R1" and "_R2" fastq.gz files.', target: {x: 21.6, y: 48.6, z: 3.0} },
+                { src: './assets/img/steps/18_step_260_paste_files.png', text: 'Navigate to the APSCALE project and paste them into the "02_demultiplexing/data" folder.', target: {x: 36.9, y: 10.3, z: 3.0} },
+                { src: './assets/img/steps/19_step_270_refresh_16_files.png', text: 'Return to the APSCALE GUI and click "Refresh files and folders". The 16 files appear! You are ready to run the analysis.', target: {x: 6.1, y: 92.0, z: 3.0} }
+            ],
+            'sv-otu': [
+                { src: './assets/img/steps/captura_03.png', text: 'Step 1: Paired-End Merging. We begin by specifying the forward and reverse primer sequences, as well as defining the maximum and minimum (approximately half of the maximum) possible sizes of the amplified fragment.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_04.png', text: 'In the denoising configuration, we define the minimum threshold of reads required to constitute an Exact Sequence Variant (ESV).', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_05.png', text: 'The sequence group threshold parameter allows us to specify the threshold for Operational Taxonomic Unit (OTU) clustering utilized by the VSEARCH algorithm.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_07.png', text: 'Once all parameters are configured, the automated execution of the pipeline is initiated, beginning the filtering process.', target: {x: 50, y: 50, z: 1} }
+            ],
+            'sv-blast': [
+                { src: './assets/img/steps/captura_08.png', text: 'BLAST (slow) can be selected, or Megablast can be chosen for accelerated alignments.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_09.png', text: 'The generated OTU or ESV FASTA file can be selected for alignment against a reference database.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_10.png', text: 'The appropriate reference databases must either be generated locally or downloaded.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_11.png', text: 'Initially, the local directory does not contain the required database files.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_12.png', text: 'Users can initiate the download process for all default APSCALE databases (Note: several native databases may be outdated).', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_15.png', text: 'The desired reference database can now be selected for taxonomic assignment.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_16.png', text: 'The alignment process is initiated by clicking "Start Taxonomic Assignment".', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_17.png', text: 'The BLAST alignment process has successfully concluded.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_18.png', text: 'The final output is an Excel (.xlsx) file detailing the BLAST results, located within the project\'s read table directory. <a href="./WORKSHOP_apscale/11_read_table/data/blastn_0_WORKSHOP_sequences/blastn_0_WORKSHOP_sequences_taxonomy.xlsx" download style="display:inline-block; margin-left:10px; color:var(--primary-color); text-decoration:underline; font-weight:bold;"><i class="ph-bold ph-download-simple"></i> Download Results Table</a>', target: {x: 50, y: 50, z: 1} }
+            ]
+        };
+
+        const ROTATION_TIME = 10000; 
+
+        // Load saved coordinates from browser storage
+        const savedCoords = JSON.parse(localStorage.getItem('apscale_coords') || '{}');
+
+        // Global zoom state
+        window.isZoomed = false;
+
+        // Create Lightbox element once
+        const lightbox = document.createElement('div');
+        lightbox.id = 'lightbox-overlay';
+        lightbox.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:9999; display:none; justify-content:center; align-items:center; cursor:zoom-out;';
+        lightbox.innerHTML = '<img style="max-width:95%; max-height:95%; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.5); object-fit:contain;" src="">';
+        document.body.appendChild(lightbox);
+        
+        lightbox.addEventListener('click', () => {
+            lightbox.style.display = 'none';
+            window.isZoomed = false;
+        });
+
+        // Dev tool: press 'Shift + D' to enable coordinate helper
+        document.addEventListener('keydown', (e) => {
+            if(e.key.toLowerCase() === 'd' && e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('dev-coord-helper').style.display = 'flex';
+                window.devMode = true;
+            }
+        });
+
+        document.getElementById('export-coords-btn').addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedCoords, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "custom_coordinates.json");
+            dlAnchorElem.click();
+        });
+
+        Object.keys(stepData).forEach(id => {
+            const container = document.getElementById(id);
+            if (!container) return;
+            const steps = stepData[id];
+
+            // Build DOM
+            container.innerHTML = `
+                <div class="progress-bar-container"><div class="progress-bar"></div></div>
+                <div class="pro-slider-display">
+                    <div class="pro-slider-images"></div>
+                    <div class="mouse-cursor"></div>
+                    <div class="click-ripple"></div>
+                </div>
+                <div class="pro-slider-caption">
+                    <div class="pro-slider-text-container"></div>
+                    <div class="pro-slider-controls">
+                        <div class="pro-slider-dots"></div>
+                        <div class="pro-slider-nav">
+                            <button class="nav-btn prev-btn"><i class="ph-bold ph-caret-left"></i></button>
+                            <button class="nav-btn next-btn"><i class="ph-bold ph-caret-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const displayArea = container.querySelector('.pro-slider-display');
+            const imgContainer = container.querySelector('.pro-slider-images');
+            const txtContainer = container.querySelector('.pro-slider-text-container');
+            const dotsContainer = container.querySelector('.pro-slider-dots');
+            const progressBar = container.querySelector('.progress-bar');
+            
+            const mouse = container.querySelector('.mouse-cursor');
+            const ripple = container.querySelector('.click-ripple');
+            
+            // Coordinate helper and Zoom logic
+            displayArea.addEventListener('click', (e) => {
+                if(window.devMode) {
+                    const rect = displayArea.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+                    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+                    
+                    // Save to local storage for this specific step
+                    const currentStep = steps[currentIndex];
+                    const stepKey = currentStep.src.split('/').pop(); // use filename as unique key
+                    savedCoords[stepKey] = { x: parseFloat(x), y: parseFloat(y), z: 1 };
+                    localStorage.setItem('apscale_coords', JSON.stringify(savedCoords));
+                    
+                    // Force update instantly
+                    updateDOM();
+                    
+                    console.log(`Saved coordinates for ${stepKey}: x=${x}, y=${y}`);
+                } else {
+                    // Zoom feature
+                    const currentStep = steps[currentIndex];
+                    lightbox.querySelector('img').src = currentStep.src;
+                    lightbox.style.display = 'flex';
+                    window.isZoomed = true;
+                    clearInterval(intervalId); // Ensure it's stopped
+                    progressBar.style.transition = 'none';
+                }
+            });
+
+            steps.forEach((step, index) => {
+                // Images
+                const img = document.createElement('img');
+                img.src = step.src;
+                if (index === 0) img.classList.add('active');
+                imgContainer.appendChild(img);
+
+                // Text blocks
+                const txt = document.createElement('div');
+                txt.className = `pro-slider-text ${index === 0 ? 'active' : ''}`;
+                txt.innerHTML = `
+                    <span class="step-badge">Step ${index + 1} of ${steps.length}</span>
+                    <p>${step.text}</p>
+                `;
+                txtContainer.appendChild(txt);
+
+                // Dots
+                const dot = document.createElement('span');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dot.addEventListener('click', () => goToSlide(index, true));
+                dotsContainer.appendChild(dot);
+            });
+
+            let currentIndex = 0;
+            let intervalId = null;
+            let clickTimeout = null;
+            let fadeOutTimeout = null;
+
+            const updateDOM = () => {
+                const currentStep = steps[currentIndex];
+                const customTarget = currentStep.target; // Strictly use the baked coordinates
+                
+                imgContainer.querySelectorAll('img').forEach((el, i) => {
+                    if (i === currentIndex) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                });
+                
+                txtContainer.querySelectorAll('.pro-slider-text').forEach((el, i) => el.classList.toggle('active', i === currentIndex));
+                dotsContainer.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === currentIndex));
+                
+                // Reset Animations
+                clearTimeout(clickTimeout);
+                clearTimeout(fadeOutTimeout);
+                mouse.style.opacity = '0';
+                
+                const playMouseSequence = () => {
+                    // 1. Jump to center instantly (hidden)
+                    mouse.style.transition = 'none';
+                    mouse.style.left = '50%';
+                    mouse.style.top = '50%';
+                    mouse.classList.remove('clicking');
+                    ripple.classList.remove('animate');
+                    
+                    // Force DOM reflow
+                    void mouse.offsetWidth;
+                    
+                    // 2. Enable transition, fade in, and travel to target
+                    mouse.style.transition = 'left 1.2s cubic-bezier(0.25, 1, 0.5, 1), top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s';
+                    mouse.style.left = `${customTarget.x}%`;
+                    mouse.style.top = `${customTarget.y}%`;
+                    mouse.style.opacity = '1';
+                    
+                    // 3. Click when it arrives
+                    clickTimeout = setTimeout(() => {
+                        mouse.classList.add('clicking');
+                        
+                        ripple.style.left = `${customTarget.x}%`;
+                        ripple.style.top = `${customTarget.y}%`;
+                        ripple.classList.add('animate');
+                        
+                        // 4. Fade out gently after clicking
+                        fadeOutTimeout = setTimeout(() => {
+                            mouse.style.opacity = '0';
+                        }, 1200);
+                    }, 1200);
+                };
+                
+                // Play immediately for this slide
+                playMouseSequence();
+            };
+
+            const animateProgress = () => {
+                progressBar.style.transition = 'none';
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.transition = `width ${ROTATION_TIME}ms linear`;
+                    progressBar.style.width = '100%';
+                }, 50);
+            };
+
+            const goToSlide = (idx, manual = false) => {
+                currentIndex = idx;
+                updateDOM();
+                if (manual) {
+                    resetInterval();
+                } else {
+                    animateProgress();
+                }
+            };
+
+            const nextSlide = () => goToSlide((currentIndex + 1) % steps.length);
+            const prevSlide = () => goToSlide((currentIndex - 1 + steps.length) % steps.length, true);
+
+            container.querySelector('.next-btn').addEventListener('click', () => goToSlide((currentIndex + 1) % steps.length, true));
+            container.querySelector('.prev-btn').addEventListener('click', prevSlide);
+
+            const startInterval = () => {
+                clearInterval(intervalId);
+                if(window.isZoomed || !isVisible) return;
+                animateProgress();
+                intervalId = setInterval(nextSlide, ROTATION_TIME);
+            };
+
+            const resetInterval = () => {
+                clearInterval(intervalId);
+                progressBar.style.transition = 'none';
+                progressBar.style.width = '0%';
+                if(!window.isZoomed) {
+                    startInterval();
+                }
+            };
+
+            container.addEventListener('mouseenter', () => {
+                clearInterval(intervalId);
+                progressBar.style.transition = 'none';
+            });
+            container.addEventListener('mouseleave', () => {
+                if(!window.isZoomed && isVisible) {
+                    startInterval();
+                }
+            });
+
+            let isVisible = false;
+            let hasInitialized = false;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        isVisible = true;
+                        if(!hasInitialized) {
+                            hasInitialized = true;
+                            setTimeout(updateDOM, 100);
+                        }
+                        if(!window.isZoomed) {
+                            startInterval();
+                        }
+                    } else {
+                        isVisible = false;
+                        clearInterval(intervalId);
+                        progressBar.style.transition = 'none';
+                        progressBar.style.width = '0%';
+                    }
+                });
+            }, { threshold: 0.2 });
+            
+            observer.observe(container);
+        });
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metabarcoding Workshop | Dashboard</title>
+    <meta name="description" content="Training portal for multi-marker metabarcoding pipeline using APSCALE, DADA2, and Kaggle.">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <!-- Phosphor Icons for modern, clean iconography -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <a href="index.html" class="sidebar-logo">
+            <i class="ph-fill ph-dna"></i>
+            <span>Me-Barcode</span>
+        </a>
+
+        <div class="nav-section">Overview</div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html" class="active">Introduction & Roadmap</a></li>
+        </ul>
+
+        <div class="nav-section">Pipeline Modules</div>
+        <ul class="sidebar-nav">
+            <li><a href="apscale.html">1. APSCALE Processing</a></li>
+            <li><a href="dada2.html">2. DADA2 & RDP</a></li>
+            <li><a href="kaggle.html">3. Cloud Execution (Kaggle)</a></li>
+        </ul>
+
+        <div class="nav-section">Resources</div>
+        <ul class="sidebar-nav">
+            <li><a href="#scripts">Download Scripts</a></li>
+            <li><a href="#databases">Reference Databases</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <h1>Multi-Marker Metabarcoding Pipeline</h1>
+            <p>Welcome to the dedicated training portal for our molecular ecology research group. This documentation will guide you through our standard computational workflow from raw sequence reads to ecological data analysis.</p>
+        </header>
+
+        <section class="hero">
+            <h2>From Sequences to Ecology</h2>
+            <p>This pipeline is designed to be fully reproducible, modular, and robust. We use environmental DNA (eDNA) and multi-marker approaches (COI, 18S, 16S) for marine biodiversity and aquaculture monitoring.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="apscale.html" class="btn">
+                    Start Module 1 <i class="ph-bold ph-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Workflow Roadmap</h2>
+            <p>Our pipeline is broken down into three core modules. Each step requires specific inputs and generates outputs that feed directly into the next phase of the analysis.</p>
+
+            <div class="card-grid">
+                <!-- Module 1 -->
+                <a href="apscale.html" class="card">
+                    <div class="card-icon">
+                        <i class="ph ph-terminal-window ph-2x"></i>
+                    </div>
+                    <h3>1. APSCALE Processing</h3>
+                    <p>Raw <code>fastq</code> processing, denoising/clustering, and initial taxonomic assignment using local databases.</p>
+                </a>
+
+                <!-- Module 2 -->
+                <a href="dada2.html" class="card">
+                    <div class="card-icon">
+                        <i class="ph ph-code ph-2x"></i>
+                    </div>
+                    <h3>2. DADA2 & RDP in R</h3>
+                    <p>Advanced statistical denoising using DADA2 and robust taxonomic classification using the RDP Classifier algorithm.</p>
+                </a>
+
+                <!-- Module 3 -->
+                <a href="kaggle.html" class="card">
+                    <div class="card-icon">
+                        <i class="ph ph-cloud ph-2x"></i>
+                    </div>
+                    <h3>3. Cloud Reproducibility</h3>
+                    <p>Executing heavy computations on Kaggle to bypass local hardware limits, and generating reproducible figures.</p>
+                </a>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Why This Architecture?</h2>
+            <p>By standardizing our workflow across these specific computational tools, we achieve three main goals:</p>
+            <ul>
+                <li><strong>Consistency:</strong> Everyone in the lab uses identical parameters, thresholds, and database configurations for comparable multi-project results.</li>
+                <li><strong>Scalability:</strong> Pushing heavy sequence-clustering tasks to Kaggle prevents local machine crashes and standardizes the computing environment.</li>
+                <li><strong>Flexibility:</strong> The modularity ensures the pipeline works seamlessly whether you are analyzing COI for metazoans, 18S for eukaryotes, or 16S for bacteria.</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Global JavaScript -->
+    <script src="./assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Kaggle Cloud | Metabarcoding Workshop</title>
+    <meta name="description" content="Learn how to run heavy computations on Kaggle and create reproducible R plots in the cloud.">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <a href="index.html" class="sidebar-logo">
+            <i class="ph-fill ph-dna"></i>
+            <span>Me-Barcode</span>
+        </a>
+
+        <div class="nav-section">Overview</div>
+        <ul class="sidebar-nav">
+            <li><a href="index.html">Introduction & Roadmap</a></li>
+        </ul>
+
+        <div class="nav-section">Pipeline Modules</div>
+        <ul class="sidebar-nav">
+            <li><a href="apscale.html">1. APSCALE Processing</a></li>
+            <li><a href="dada2.html">2. DADA2 & RDP</a></li>
+            <li><a href="kaggle.html" class="active">3. Cloud Execution (Kaggle)</a></li>
+        </ul>
+
+        <div class="nav-section">Resources</div>
+        <ul class="sidebar-nav">
+            <li><a href="#scripts">Download Scripts</a></li>
+            <li><a href="#databases">Reference Databases</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <h1>Module 3: AI Plotting via Kaggle Cloud</h1>
+            <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 800px; line-height: 1.6;">Welcome to the final module. In this section, we transition to the cloud using Kaggle. <strong>Important Note:</strong> For this part, we will directly use the outputs from the <em>APSCALE Taxonomic Assignment</em>. We will leverage AI to automatically generate the R code necessary to make comprehensive diversity plots based on that taxonomic data.</p>
+        </header>
+
+
+        <!-- Conceptual Intro -->
+        <section>
+            <h2>Cloud Execution & AI Visualization</h2>
+            <p>Unlike the previous steps where we manually clicked through GUI steps and executed local scripts, the cloud execution is entirely automated through Kaggle Kernels and AI assistance. <strong>There are no manual PNG steps to follow here.</strong></p>
+            
+            <p>The workflow is simple:</p>
+            <ol style="line-height: 1.8; margin-top: 1rem; color: var(--text-color);">
+                <li>Upload the comprehensive <code>.xlsx</code> taxonomic assignment table generated at the end of the APSCALE pipeline.</li>
+                <li>Import the data into a new Kaggle Notebook.</li>
+                <li>Use AI assistants (like ChatGPT, Claude, or Kaggle's built-in AI) to generate the R/Python code for ecological visualization (e.g., stacked bar charts, alpha diversity metrics, NMDS plots).</li>
+                <li>Execute the AI-generated code directly in the Kaggle cloud environment.</li>
+                <li>Download your publication-ready plots.</li>
+            </ol>
+
+            <div class="alert" style="background-color: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 0 0.5rem 0.5rem 0; margin-top: 2rem;">
+                <h4 style="margin-top: 0; color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem;"><i class="ph-bold ph-info"></i> Why Kaggle & AI?</h4>
+                <p style="margin-bottom: 0; font-size: 0.95rem;">Writing customized plotting scripts from scratch can be tedious and prone to syntax errors. By feeding the standard APSCALE output matrix to an AI, you can generate complex `ggplot2` visualizations in seconds, all powered by Kaggle's free cloud computing resources.</p>
+            </div>
+
+            <div style="margin-top: 4rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                <a href="dada2.html" class="text-link"><i class="ph-bold ph-arrow-left"></i> Previous Module: RDP Classifier</a>
+                <a href="index.html" class="btn">Finish Workshop <i class="ph-bold ph-check"></i></a>
+            </div>
+        </section>
+    </main>
+
+    <script src="./assets/js/main.js"></script>
+</body>
+</html>

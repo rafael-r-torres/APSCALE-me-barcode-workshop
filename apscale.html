@@ -287,7 +287,14 @@
         <!-- ══ Section 6: BLAST Taxonomic Assignment ══ -->
         <section>
             <h2 style="margin-top: 4rem;">6. BLAST Taxonomic Assignment</h2>
-            <p>With our OTUs generated, we must classify them taxonomically. This requires fetching the appropriate reference databases (e.g. BOLD, NCBI) and executing Megablast to align and classify our sequence variants.</p>
+            <p>With our ESVs generated, we must classify them taxonomically. This requires fetching the appropriate reference databases (e.g. MIDORI, SILVA) and executing Megablast to align and classify our sequence variants.</p>
+            
+            <h3 style="margin-top: 2rem; color: var(--text-color);">6.1 Generating &amp; Updating Databases</h3>
+            <p>To ensure precise taxonomic assignment, it is highly recommended to update or generate new reference databases. This can be done directly through the interface to fetch the latest data.</p>
+            <div class="pro-slider" id="sv-database"></div>
+
+            <h3 style="margin-top: 4rem; color: var(--text-color);">6.2 Running the Assignment</h3>
+            <p>Once the databases are ready, we can proceed with aligning and classifying our sequences.</p>
             <div class="pro-slider" id="sv-blast"></div>
 
             <div style="margin-top: 4rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
@@ -336,6 +343,13 @@
                 { src: './assets/img/steps/captura_04.png', text: 'In the denoising configuration, we define the minimum threshold of reads required to constitute an Exact Sequence Variant (ESV).', target: {x: 50, y: 50, z: 1} },
                 { src: './assets/img/steps/captura_05.png', text: 'The sequence group threshold parameter allows us to specify the threshold for Operational Taxonomic Unit (OTU) clustering utilized by the VSEARCH algorithm.', target: {x: 50, y: 50, z: 1} },
                 { src: './assets/img/steps/captura_07.png', text: 'Once all parameters are configured, the automated execution of the pipeline is initiated, beginning the filtering process.', target: {x: 50, y: 50, z: 1} }
+            ],
+            'sv-database': [
+                { src: './assets/img/steps/captura_db_01.png', text: 'First, locate the database generation Python script alongside your reference FASTA file, which can be acquired from external repositories such as MIDORI or SILVA.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_db_02.png', text: 'Open the script in your preferred editor and configure it with the parameters specific to your new reference database.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_db_03.png', text: 'Execute the configured script within your terminal to initiate the database build process.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_db_05.png', text: 'The compilation process is generally rapid, and your updated local database will be generated shortly thereafter.', target: {x: 50, y: 50, z: 1} },
+                { src: './assets/img/steps/captura_db_06.png', text: '<strong>Note:</strong> Depending on the formatting of your downloaded FASTA files, the script may require structural adjustments. We recommend utilizing an AI assistant to quickly adapt the parsing logic.', target: {x: 50, y: 50, z: 1} }
             ],
             'sv-blast': [
                 { src: './assets/img/steps/captura_08.png', text: 'BLAST (slow) can be selected, or Megablast can be chosen for accelerated alignments.', target: {x: 50, y: 50, z: 1} },
